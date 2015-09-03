@@ -7,11 +7,8 @@ install_requires_pip = parse_requirements('requirements.txt',
                                           session=uuid.uuid1())
 
 install_requires_setuptools = []
-dependency_links_setuptools = []
 
 for ir in install_requires_pip:
-    if ir.url and ir.url.startswith('git'):
-        dependency_links_setuptools.append(ir.url)
     install_requires_setuptools.append(str(ir.req))
 
 setup(
@@ -28,10 +25,9 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'proviant-config-set = proviant.cmd.config:set_path',
+            'mongo-fluud = mongo_fluud_alemeshko:start_fluud',
         ]
     },
     install_requires=install_requires_setuptools,
-    dependency_links=dependency_links_setuptools,
     include_package_data=True
 )
