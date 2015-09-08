@@ -5,6 +5,7 @@ import dateutil.parser
 import copy
 import sys
 import argparse
+import urllib
 from gevent import monkey, spawn, sleep
 from gevent.queue import JoinableQueue
 
@@ -15,9 +16,18 @@ def start_fluud():
     parser = argparse.ArgumentParser()
     parser.add_argument('host', help='mongo host')
     parser.add_argument('port', help='mongo port')
+    parser.add_argument('--login', help='mongo login')
+    parser.add_argument('--password', help='mongo password')
     args = parser.parse_args()
 
-    client = MongoClient('mongodb://{}:{}/'.format(args.host, args.port))
+    if args.login and args.password:
+        login = urllib.quote_plus(args.login)
+        password = urllib.quote_plus(args.password)
+        uri = 'mongodb://{}:{}@{}:{}/'.format(login, password, args.host, args.port)
+    else:
+        uri = 'mongodb://{}:{}/'.format(args.host, args.port)
+
+    client = MongoClient(uri)
 
     template = {
         "first_sample_timestamp": dateutil.parser.parse("2015-09-02T13:08:20.314Z"),
@@ -59,7 +69,6 @@ def start_fluud():
         "source": "openstack",
         "user_id": "openstack:610e7d74-16af-4358-9b77-5275194fa6e4"
     }
-
 
     data = [copy.deepcopy(template) for _ in range(10000)]
 
